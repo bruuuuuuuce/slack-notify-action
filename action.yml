@@ -23,36 +23,35 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Set status emoji, text, and color
-      id: status
+    # Step to compute final Slack message
+    - name: Compute Slack message
+      id: slack_message
       shell: bash
       run: |
         if [ "${{ inputs.isSuccess }}" = "true" ]; then
-          echo "emoji=:white_check_mark:" >> $GITHUB_OUTPUT
-          echo "status=Success" >> $GITHUB_OUTPUT
+          echo "message=${{ inputs.message:-Deployment finished successfully 🎉 }}" >> $GITHUB_OUTPUT
           echo "color=#36a64f" >> $GITHUB_OUTPUT
         else
-          echo "emoji=:x:" >> $GITHUB_OUTPUT
-          echo "status=Failed" >> $GITHUB_OUTPUT
+          echo "message=${{ inputs.message:-Deployment finished with errors ❌. Failed <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|build logs> }}" >> $GITHUB_OUTPUT
           echo "color=#ff0000" >> $GITHUB_OUTPUT
         fi
 
+    # Step to send Slack notification
     - name: Send Slack notification via bot token
       uses: slackapi/slack-github-action@v1.27.0
       with:
         channel-id: ${{ inputs.channel-id }}
         payload: |
           {
-            "text": "Deployment notification",
             "attachments": [
               {
-                "color": "${{ steps.status.outputs.color }}",
+                "color": "${{ steps.slack_message.outputs.color }}",
                 "blocks": [
                   {
                     "type": "section",
                     "text": {
                       "type": "mrkdwn",
-                      "text": "*${{ inputs.environment }}* — ${{ steps.status.outputs.status }} ${{ steps.status.outputs.emoji }} : ${{ inputs.message }}"
+                      "text": "*${{ inputs.environment }}* — ${{ steps.slack_message.outputs.message }}"
                     }
                   },
                   {
