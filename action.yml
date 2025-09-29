@@ -36,27 +36,21 @@ runs:
       with:
         payload: |
           {
-            "text": "*${{ inputs.environment }}* — ${{ steps.color.outputs.status }}: ${{ inputs.message }}",
-            "attachments": [
+            "text": "Deployment notification",
+            "blocks": [
               {
-                "color": "${{ steps.color.outputs.color }}",
-                "fields": [
-                  {
-                    "title": "Repo",
-                    "value": "${{ github.repository }}",
-                    "short": true
-                  },
-                  {
-                    "title": "Commit",
-                    "value": "<${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>",
-                    "short": true
-                  },
-                  {
-                    "title": "Actor",
-                    "value": "${{ github.actor }}",
-                    "short": true
-                  }
-                ]
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*${{ inputs.environment }}* — ${{ steps.status.outputs.status }} ${{ steps.status.outputs.emoji }} : ${{ inputs.message }}"
+                }
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*Repo:*\n${{ github.repository }}\n*Commit:*\n<${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\n*Actor:*\n${{ github.actor }}"
+                }
               }
             ]
           }
