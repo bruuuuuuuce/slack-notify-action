@@ -6,10 +6,6 @@ inputs:
   environment:
     description: "Deployment environment"
     required: true
-  message:
-    description: "Custom message to include"
-    required: false
-    default: "Deployment finished"
   isSuccess:
     description: "Whether the deployment succeeded"
     required: true
@@ -23,16 +19,16 @@ inputs:
 runs:
   using: "composite"
   steps:
-    # Step to compute final Slack message
+    # Step to compute the Slack message
     - name: Compute Slack message
       id: slack_message
       shell: bash
       run: |
         if [ "${{ inputs.isSuccess }}" = "true" ]; then
-          echo "message=${{ inputs.message:-Deployment finished successfully 🎉 }}" >> $GITHUB_OUTPUT
+          echo "message=Deployment finished successfully 🎉" >> $GITHUB_OUTPUT
           echo "color=#36a64f" >> $GITHUB_OUTPUT
         else
-          echo "message=${{ inputs.message:-Deployment finished with errors ❌. Failed <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|build logs> }}" >> $GITHUB_OUTPUT
+          echo "message=Deployment finished with errors ❌. Failed <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|build logs>" >> $GITHUB_OUTPUT
           echo "color=#ff0000" >> $GITHUB_OUTPUT
         fi
 
