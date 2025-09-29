@@ -16,6 +16,9 @@ inputs:
   channel:
     description: "Slack channel to post to (e.g. #general)"
     required: true
+  slack_bot_token:
+    description: "Slack Bot Token (xoxb-...)"
+    required: true
 
 runs:
   using: "composite"
@@ -57,4 +60,4 @@ runs:
             ]
           }
       env:
-        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        SLACK_BOT_TOKEN: ${{ inputs.slack_bot_token }}
