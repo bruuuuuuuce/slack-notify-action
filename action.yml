@@ -1,5 +1,5 @@
 name: "Slack Notify Action"
-description: "Send a Slack notification on deployment success/failure"
+description: "Send a Slack notification on deployment success/failure using a bot token"
 author: "bruuuuuuuce"
 
 inputs:
@@ -13,30 +13,32 @@ inputs:
   isSuccess:
     description: "Whether the deployment succeeded"
     required: true
-  slack_webhook_url:
-    description: "Slack Incoming Webhook URL"
+  channel:
+    description: "Slack channel to post to (e.g. #general)"
     required: true
 
 runs:
   using: "composite"
   steps:
-    - name: Set Slack color and status
-      id: color
+    - name: Set status emoji and text
+      id: status
       shell: bash
       run: |
         if [ "${{ inputs.isSuccess }}" = "true" ]; then
-          echo "color=#36a64f" >> $GITHUB_OUTPUT
-          echo "status=Success ✅" >> $GITHUB_OUTPUT
+          echo "emoji=:white_check_mark:" >> $GITHUB_OUTPUT
+          echo "status=Success" >> $GITHUB_OUTPUT
         else
-          echo "color=#ff0000" >> $GITHUB_OUTPUT
-          echo "status=Failed ❌" >> $GITHUB_OUTPUT
+          echo "emoji=:x:" >> $GITHUB_OUTPUT
+          echo "status=Failed" >> $GITHUB_OUTPUT
         fi
 
-    - name: Send Slack notification
+    - name: Send Slack notification via bot token
       uses: slackapi/slack-github-action@v1.27.0
       with:
+        channel: ${{ inputs.channel }}
         payload: |
           {
+            "text": "Deployment notification",
             "blocks": [
               {
                 "type": "section",
@@ -55,4 +57,4 @@ runs:
             ]
           }
       env:
-        SLACK_WEBHOOK_URL: ${{ inputs.slack_webhook_url }}
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
