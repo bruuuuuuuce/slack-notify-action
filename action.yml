@@ -38,25 +38,20 @@ runs:
         payload: |
           {
             "text": "Deployment notification",
-            "attachments": [
+            "blocks": [
               {
-                "color": "${{ steps.color.outputs.color }}",
-                "blocks": [
-                  {
-                    "type": "section",
-                    "text": {
-                      "type": "mrkdwn",
-                      "text": "*${{ inputs.environment }}* — ${{ steps.color.outputs.status }} : ${{ inputs.message }}"
-                    }
-                  },
-                  {
-                    "type": "section",
-                    "text": {
-                      "type": "mrkdwn",
-                      "text": "*Repo:*\n${{ github.repository }}\n*Commit:*\n<${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\n*Actor:*\n${{ github.actor }}"
-                    }
-                  }
-                ]
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*${{ inputs.environment }}* — ${{ steps.status.outputs.status }} ${{ steps.status.outputs.emoji }} : ${{ inputs.message }}"
+                }
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*Repo:*\n${{ github.repository }}\n*Commit:*\n<${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\n*Actor:*\n${{ github.actor }}"
+                }
               }
             ]
           }
