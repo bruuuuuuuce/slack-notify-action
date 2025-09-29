@@ -1,4 +1,4 @@
-name: "Slack Notify Action"
+name: "Slack Deploy Notify Action"
 description: "Send a Slack notification on deployment success/failure using a bot token with color and full visibility"
 author: "bruuuuuuuce"
 
@@ -6,13 +6,13 @@ inputs:
   environment:
     description: "Deployment environment"
     required: true
-  isSuccess:
+  is-success:
     description: "Whether the deployment succeeded"
     required: true
   channel-id:
     description: "Slack channel to post to (e.g. #general)"
     required: true
-  slack_bot_token:
+  slack-bot-token:
     description: "Slack Bot Token (xoxb-...)"
     required: true
 
@@ -24,7 +24,7 @@ runs:
       id: slack_message
       shell: bash
       run: |
-        if [ "${{ inputs.isSuccess }}" = "true" ]; then
+        if [ "${{ inputs.is-success }}" = "true" ]; then
           echo "message=Deployment finished successfully 🎉" >> $GITHUB_OUTPUT
           echo "color=#36a64f" >> $GITHUB_OUTPUT
         else
@@ -72,4 +72,4 @@ runs:
             ]
           }
       env:
-        SLACK_BOT_TOKEN: ${{ inputs.slack_bot_token }}
+        SLACK_BOT_TOKEN: ${{ inputs.slack-bot-token }}
