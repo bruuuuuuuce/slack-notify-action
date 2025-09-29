@@ -37,7 +37,7 @@ runs:
       with:
         payload: |
           {
-            "text": "*production* — Success ✅ : Deployment finished successfully 🎉",
+            "text": "Deployment notification",
             "attachments": [
               {
                 "color": "${{ steps.color.outputs.color }}",
