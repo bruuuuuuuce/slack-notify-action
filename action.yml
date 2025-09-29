@@ -37,7 +37,6 @@ runs:
       with:
         payload: |
           {
-            "text": "Deployment notification",
             "blocks": [
               {
                 "type": "section",
