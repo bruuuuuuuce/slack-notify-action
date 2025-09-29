@@ -30,9 +30,11 @@ runs:
         if [ "${{ inputs.isSuccess }}" = "true" ]; then
           echo "emoji=:white_check_mark:" >> $GITHUB_OUTPUT
           echo "status=Success" >> $GITHUB_OUTPUT
+          echo "color=#36a64f" >> $GITHUB_OUTPUT
         else
           echo "emoji=:x:" >> $GITHUB_OUTPUT
           echo "status=Failed" >> $GITHUB_OUTPUT
+          echo "color=#ff0000" >> $GITHUB_OUTPUT
         fi
 
     - name: Send Slack notification via bot token
@@ -41,7 +43,6 @@ runs:
         channel-id: ${{ inputs.channel-id }}
         payload: |
           {
-            "text": "Deployment notification",
             "attachments": [
               {
                 "color": "${{ steps.status.outputs.color }}",
