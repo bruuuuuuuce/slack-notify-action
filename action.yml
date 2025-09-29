@@ -1,25 +1,26 @@
 name: "Slack Notify Action"
 description: "Send a Slack notification on deployment success/failure"
 author: "bruuuuuuuce"
+
 inputs:
   environment:
     description: "Deployment environment"
     required: true
   message:
-    description: "Custom message to send"
+    description: "Custom message to include"
     required: false
     default: "Deployment finished"
   isSuccess:
     description: "Whether the deployment succeeded"
     required: true
   slack_webhook_url:
-    description: "Slack webhook URL"
+    description: "Slack Incoming Webhook URL"
     required: true
 
 runs:
   using: "composite"
   steps:
-    - name: Set Slack color
+    - name: Set Slack color and status
       id: color
       shell: bash
       run: |
@@ -50,9 +51,18 @@ runs:
                   {
                     "type": "section",
                     "fields": [
-                      "*Repo:*\n${{ github.repository }}",
-                      "*Commit:*\n<${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>",
-                      "*Actor:*\n${{ github.actor }}"
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Repo:*\n${{ github.repository }}"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Commit:*\n<${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Actor:*\n${{ github.actor }}"
+                      }
                     ]
                   }
                 ]
