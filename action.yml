@@ -1,5 +1,5 @@
 name: "Slack Notify Action"
-description: "Send a Slack notification on deployment success/failure using a bot token"
+description: "Send a Slack notification on deployment success/failure using a bot token with color and full visibility"
 author: "bruuuuuuuce"
 
 inputs:
@@ -23,7 +23,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Set status emoji and text
+    - name: Set status emoji, text, and color
       id: status
       shell: bash
       run: |
@@ -35,7 +35,6 @@ runs:
           echo "emoji=:x:" >> $GITHUB_OUTPUT
           echo "status=Failed" >> $GITHUB_OUTPUT
           echo "color=#ff0000" >> $GITHUB_OUTPUT
-        fi
 
     - name: Send Slack notification via bot token
       uses: slackapi/slack-github-action@v1.27.0
@@ -43,6 +42,7 @@ runs:
         channel-id: ${{ inputs.channel-id }}
         payload: |
           {
+            "text": "Deployment notification",
             "attachments": [
               {
                 "color": "${{ steps.status.outputs.color }}",
@@ -55,11 +55,21 @@ runs:
                     }
                   },
                   {
-                    "type": "section",
-                    "text": {
-                      "type": "mrkdwn",
-                      "text": "*Repo:*\n${{ github.repository }}\n*Commit:*\n<${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\n*Actor:*\n${{ github.actor }}"
-                    }
+                    "type": "context",
+                    "elements": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Repo:* ${{ github.repository }}"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Actor:* ${{ github.actor }}"
+                      }
+                    ]
                   }
                 ]
               }
@@ -67,4 +77,3 @@ runs:
           }
       env:
         SLACK_BOT_TOKEN: ${{ inputs.slack_bot_token }}
-
