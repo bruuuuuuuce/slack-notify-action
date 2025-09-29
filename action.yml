@@ -1,0 +1,64 @@
+name: "Slack Notify Action"
+description: "Send a Slack notification on deployment success/failure"
+author: "Your Org"
+inputs:
+  environment:
+    description: "Deployment environment"
+    required: true
+  message:
+    description: "Custom message to send"
+    required: false
+    default: "Deployment finished"
+  isSuccess:
+    description: "Whether the deployment succeeded"
+    required: true
+  slack_webhook_url:
+    description: "Slack webhook URL"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set Slack color
+      id: color
+      shell: bash
+      run: |
+        if [ "${{ inputs.isSuccess }}" = "true" ]; then
+          echo "color=#36a64f" >> $GITHUB_OUTPUT
+          echo "status=Success ✅" >> $GITHUB_OUTPUT
+        else
+          echo "color=#ff0000" >> $GITHUB_OUTPUT
+          echo "status=Failed ❌" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Send Slack notification
+      uses: slackapi/slack-github-action@v1.27.0
+      with:
+        payload: |
+          {
+            "text": "*${{ inputs.environment }}* — ${{ steps.color.outputs.status }}: ${{ inputs.message }}",
+            "attachments": [
+              {
+                "color": "${{ steps.color.outputs.color }}",
+                "fields": [
+                  {
+                    "title": "Repo",
+                    "value": "${{ github.repository }}",
+                    "short": true
+                  },
+                  {
+                    "title": "Commit",
+                    "value": "<${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>",
+                    "short": true
+                  },
+                  {
+                    "title": "Actor",
+                    "value": "${{ github.actor }}",
+                    "short": true
+                  }
+                ]
+              }
+            ]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ inputs.slack_webhook_url }}
