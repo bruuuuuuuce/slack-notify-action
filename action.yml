@@ -35,6 +35,7 @@ runs:
           echo "emoji=:x:" >> $GITHUB_OUTPUT
           echo "status=Failed" >> $GITHUB_OUTPUT
           echo "color=#ff0000" >> $GITHUB_OUTPUT
+        fi
 
     - name: Send Slack notification via bot token
       uses: slackapi/slack-github-action@v1.27.0
