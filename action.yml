@@ -1,58 +1,75 @@
-name: "Slack Notify Action"
-description: "Send a Slack notification on deployment success/failure"
-author: "Your Org"
+name: "Slack Deploy Notify Action"
+description: "Send a Slack notification on deployment success/failure using a bot token with color and full visibility"
+author: "bruuuuuuuce"
+
 inputs:
   environment:
     description: "Deployment environment"
     required: true
-  message:
-    description: "Custom message to send"
-    required: false
-    default: "Deployment finished"
-  isSuccess:
+  is-success:
     description: "Whether the deployment succeeded"
     required: true
-  slack_webhook_url:
-    description: "Slack webhook URL"
+  channel-id:
+    description: "Slack channel to post to (e.g. #general)"
+    required: true
+  slack-bot-token:
+    description: "Slack Bot Token (xoxb-...)"
     required: true
 
 runs:
   using: "composite"
   steps:
-    - name: Set Slack color
-      id: color
+    # Step to compute the Slack message
+    - name: Compute Slack message
+      id: slack_message
       shell: bash
       run: |
-        if [ "${{ inputs.isSuccess }}" = "true" ]; then
+        if [ "${{ inputs.is-success }}" = "true" ]; then
+          echo "message=Deployment finished successfully 🎉" >> $GITHUB_OUTPUT
           echo "color=#36a64f" >> $GITHUB_OUTPUT
-          echo "status=Success ✅" >> $GITHUB_OUTPUT
         else
+          echo "message=Deployment finished with errors ❌. Failed <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|build logs>" >> $GITHUB_OUTPUT
           echo "color=#ff0000" >> $GITHUB_OUTPUT
-          echo "status=Failed ❌" >> $GITHUB_OUTPUT
         fi
 
-    - name: Send Slack notification
+    # Step to send Slack notification
+    - name: Send Slack notification via bot token
       uses: slackapi/slack-github-action@v1.27.0
       with:
+        channel-id: ${{ inputs.channel-id }}
         payload: |
           {
-            "text": "Deployment notification",
-            "blocks": [
+            "attachments": [
               {
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "*${{ inputs.environment }}* — ${{ steps.status.outputs.status }} ${{ steps.status.outputs.emoji }} : ${{ inputs.message }}"
-                }
-              },
-              {
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "*Repo:*\n${{ github.repository }}\n*Commit:*\n<${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\n*Actor:*\n${{ github.actor }}"
-                }
+                "color": "${{ steps.slack_message.outputs.color }}",
+                "blocks": [
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "*${{ inputs.environment }}* — ${{ steps.slack_message.outputs.message }}"
+                    }
+                  },
+                  {
+                    "type": "context",
+                    "elements": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Repo:* ${{ github.repository }}"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Actor:* ${{ github.actor }}"
+                      }
+                    ]
+                  }
+                ]
               }
             ]
           }
       env:
-        SLACK_WEBHOOK_URL: ${{ inputs.slack_webhook_url }}
+        SLACK_BOT_TOKEN: ${{ inputs.slack-bot-token }}

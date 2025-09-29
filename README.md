@@ -1,25 +1,36 @@
-# Slack Notify Action
+# Slack Deploy Notify Action
 
-[![GitHub release](https://img.shields.io/github/v/release/org/slack-notify-action?logo=github&style=flat-square)](https://github.com/org/slack-notify-action/releases)
-[![Workflow Test](https://img.shields.io/github/actions/workflow/status/org/slack-notify-action/test-action.yml?label=tests&logo=github&style=flat-square)](https://github.com/org/slack-notify-action/actions)
-[![License](https://img.shields.io/github/license/org/slack-notify-action?style=flat-square)](LICENSE)
-
-A reusable GitHub Action that sends a Slack message when a deployment succeeds or fails.  
-The message includes repo, commit, and actor details, and shows **green for success** or **red for failure**.
+Send a Slack notification on deployment success or failure using a bot token, with color coding and full visibility.
 
 ---
 
-## 🚀 Usage
+## Features
 
-Add this step to your workflow:
+- Automatically sets **success (green)** or **failure (red)** colors.  
+- Includes a clickable **“build logs”** link if deployment fails.  
+- Shows **repo, commit, and actor** in Slack context block.  
+- Works as a reusable **composite GitHub Action**.
+
+---
+
+## Usage
+
+### Example Workflow
 
 ```yaml
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: echo "🚀 Deploying..." # your deployment command
+      - run: echo "🚀 Deploying..." # your deployment commands
 
   notify:
     needs: deploy
@@ -27,19 +38,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send Slack notification
-        uses: org/slack-notify-action@v1
+        uses: bruuuuuuuce/slack-deploy-notify-action@v1
         with:
           environment: "production"
-          message: ${{ needs.deploy.result == 'success' && 'Deployment finished successfully 🎉' || 'Deployment failed 🚨' }}
-          isSuccess: ${{ needs.deploy.result == 'success' }}
-          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          is-success: ${{ needs.deploy.result == 'success' }}
+          channel-id: "C08H67G6D3N"
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
 ```
 
 ## Inputs
 
-| Name                | Required | Type    | Description                                                           |
-| ------------------- | -------- | ------- | --------------------------------------------------------------------- |
-| `environment`       | ✅        | string  | The environment being deployed (e.g. `staging`, `production`).        |
-| `message`           | ❌        | string  | Custom message to include. Defaults to `"Deployment finished"`.       |
-| `isSuccess`         | ✅        | boolean | Whether the deployment succeeded (`true` = green ✅, `false` = red ❌). |
-| `slack_webhook_url` | ✅        | string  | Slack Incoming Webhook URL (set via GitHub secret).                   |
+| Name              | Required | Description                                                     |
+| ----------------- | -------- | --------------------------------------------------------------- |
+| `environment`     | Yes      | Deployment environment (e.g., `production`, `staging`)          |
+| `is-success`      | Yes      | Whether the deployment succeeded (`true` or `false`)            |
+| `channel-id`      | Yes      | Slack channel ID to post the notification (e.g., `C08H67G6D3N`) |
+| `slack-bot-token` | Yes      | Slack Bot Token (xoxb-...)                                      |
