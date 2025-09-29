@@ -50,18 +50,9 @@ runs:
                   {
                     "type": "section",
                     "fields": [
-                      {
-                        "type": "mrkdwn",
-                        "text": "*Repo:*\n${{ github.repository }}"
-                      },
-                      {
-                        "type": "mrkdwn",
-                        "text": "*Commit:*\n<${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>"
-                      },
-                      {
-                        "type": "mrkdwn",
-                        "text": "*Actor:*\n${{ github.actor }}"
-                      }
+                      "*Repo:*\n${{ github.repository }}",
+                      "*Commit:*\n<${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>",
+                      "*Actor:*\n${{ github.actor }}"
                     ]
                   }
                 ]
