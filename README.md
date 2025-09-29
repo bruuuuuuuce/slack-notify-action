@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send Slack notification
-        uses: bruuuuuuuce/slack-notify-action@v1
+        uses: bruuuuuuuce/slack-deploy-notify-action@v1
         with:
           environment: "production"
           is-success: ${{ needs.deploy.result == 'success' }}
