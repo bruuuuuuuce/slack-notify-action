@@ -13,7 +13,7 @@ inputs:
   isSuccess:
     description: "Whether the deployment succeeded"
     required: true
-  channel:
+  channel-id:
     description: "Slack channel to post to (e.g. #general)"
     required: true
   slack_bot_token:
@@ -38,7 +38,7 @@ runs:
     - name: Send Slack notification via bot token
       uses: slackapi/slack-github-action@v1.27.0
       with:
-        channel: ${{ inputs.channel }}
+        channel-id: ${{ inputs.channel-id }}
         payload: |
           {
             "text": "Deployment notification",
