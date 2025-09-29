@@ -37,6 +37,7 @@ runs:
       with:
         payload: |
           {
+            "text": "*production* — Success ✅ : Deployment finished successfully 🎉",
             "attachments": [
               {
                 "color": "${{ steps.color.outputs.color }}",
@@ -50,20 +51,10 @@ runs:
                   },
                   {
                     "type": "section",
-                    "fields": [
-                      {
-                        "type": "mrkdwn",
-                        "text": "*Repo:*\n${{ github.repository }}"
-                      },
-                      {
-                        "type": "mrkdwn",
-                        "text": "*Commit:*\n<${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>"
-                      },
-                      {
-                        "type": "mrkdwn",
-                        "text": "*Actor:*\n${{ github.actor }}"
-                      }
-                    ]
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "*Repo:*\n${{ github.repository }}\n*Commit:*\n<${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\n*Actor:*\n${{ github.actor }}"
+                    }
                   }
                 ]
               }
