@@ -38,26 +38,32 @@ runs:
     - name: Send Slack notification via bot token
       uses: slackapi/slack-github-action@v1.27.0
       with:
-        channel-id: ${{ inputs.channel-id }}
+        channel-id: ${{ inputs.channel }}
         payload: |
           {
             "text": "Deployment notification",
-            "blocks": [
+            "attachments": [
               {
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "*${{ inputs.environment }}* — ${{ steps.status.outputs.status }} ${{ steps.status.outputs.emoji }} : ${{ inputs.message }}"
-                }
-              },
-              {
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "*Repo:*\n${{ github.repository }}\n*Commit:*\n<${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\n*Actor:*\n${{ github.actor }}"
-                }
+                "color": "${{ steps.status.outputs.color }}",
+                "blocks": [
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "*${{ inputs.environment }}* — ${{ steps.status.outputs.status }} ${{ steps.status.outputs.emoji }} : ${{ inputs.message }}"
+                    }
+                  },
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "*Repo:*\n${{ github.repository }}\n*Commit:*\n<${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\n*Actor:*\n${{ github.actor }}"
+                    }
+                  }
+                ]
               }
             ]
           }
       env:
         SLACK_BOT_TOKEN: ${{ inputs.slack_bot_token }}
+
